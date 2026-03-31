@@ -1,6 +1,8 @@
-# OpenClaw - Multi-Agent SFW Framework
+# OpenClaw SFW - Multi-Agent Framework
 
-A minimal, multi-agent AI framework with sandboxed filesystem access, persistent identity, memory, scheduled behaviors, and skills. A coordinator agent delegates tasks to specialist agents. Based on the [OpenClaw](https://github.com/openclaw/openclaw) framework, stripped down to essentials.
+A minimal, multi-agent AI framework with sandboxed filesystem access, persistent identity, memory, scheduled behaviors, and skills. A coordinator agent delegates tasks to specialist agents.
+
+Forked from [OpenClaw](https://github.com/openclaw/openclaw) and stripped down to essentials. Source: [dgwparenti/openclaw-sfw](https://github.com/dgwparenti/openclaw-sfw).
 
 ## What It Does
 
@@ -34,8 +36,13 @@ You can also chat directly with any agent using `/switch <id>` in the chat REPL.
 ## Quick Start
 
 ```bash
-# Install dependencies
-npm install
+# Clone
+git clone git@github.com:dgwparenti/openclaw-sfw.git
+cd openclaw-sfw
+git checkout sfw-dev
+
+# Install dependencies (pnpm or npm)
+pnpm install   # or: npm install
 
 # First-time setup (pick provider, configure agents, approve directories)
 npx tsx src/cli/main.ts onboard
@@ -238,7 +245,7 @@ src/
 
 ## Credits
 
-Based on [OpenClaw](https://github.com/openclaw/openclaw). Stripped from 8,700+ files to 18 files while preserving the core agent runtime concepts and adding multi-agent coordination.
+Forked from [OpenClaw](https://github.com/openclaw/openclaw). Stripped from 8,700+ files to 18 files while preserving the core agent runtime concepts and adding multi-agent coordination.
 
 ## License
 
