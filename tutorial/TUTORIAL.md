@@ -347,85 +347,168 @@ npx tsx src/cli/main.ts agents remove analyst
 
 ---
 
-## 8. Per-Agent Model Configuration
+## 8. The Config Agent
 
-Each agent can use a different model or provider. This is configured in `~/.officeclaw/config.json`.
+By default, agents cannot modify the OfficeClaw config or other agents' files — those paths are outside the sandbox. In this section you will create a dedicated **config agent** that has write access to the `~/.officeclaw/` directory, making it the single point of control for changing personas, models, and system settings.
 
-> **Note:** Agents cannot change their own model at runtime. The config file must be edited manually, then the chat restarted for changes to take effect.
+> **Important:** Changes to `config.json` or SOUL.md files only take effect after restarting the chat.
 
-### 8.1 View the current config
-
-```bash
-cat ~/.officeclaw/config.json
-```
-
-Each agent entry has `"provider"` and `"model"` fields:
-
-```json
-{
-  "id": "coder",
-  "name": "Coder",
-  "provider": "ollama",
-  "model": "llama3.1:8b-instruct-q8_0",
-  ...
-}
-```
-
-### 8.2 Change the model for one agent
-
-Open the config and change just the coder's model (for example, to a different Ollama model):
+### 8.1 Create the config agent
 
 ```bash
-# Edit with your preferred editor
-nano ~/.officeclaw/config.json
+npx tsx src/cli/main.ts agents add config --name "Config Manager"
 ```
 
-Change the `"model"` field for the agent you want to update. For example, to give the coder a different model than the others:
+### 8.2 Grant it access to the OfficeClaw directory
+
+The config agent needs read-write access to the entire `~/.officeclaw/` tree (config files, agent workspaces, skills):
+
+```bash
+npx tsx src/cli/main.ts sandbox add ~/.officeclaw --write
+```
+
+### 8.3 Give it a specialized SOUL.md
+
+```bash
+cat > ~/.officeclaw/agents/config/SOUL.md << 'EOF'
+# Config Manager Agent
+
+You are the OfficeClaw configuration manager. You are the ONLY agent with write access to the system config and other agents' workspace files.
+
+## Your Responsibilities
+
+1. **Edit agent personas** — modify any agent's `~/.officeclaw/agents/<id>/SOUL.md`
+2. **Change models** — update `"provider"` and `"model"` fields in `~/.officeclaw/config.json`
+3. **Manage agent settings** — add/remove agents in `config.json`, update skills directories
+4. **Verify changes** — after any edit, read the file back and confirm it is valid JSON (for config.json) or valid Markdown (for SOUL.md)
+
+## Config File Structure
+
+The main config lives at `~/.officeclaw/config.json`:
 
 ```json
 {
-  "id": "coder",
-  "name": "Coder",
-  "provider": "ollama",
-  "model": "codellama:13b",
-  ...
+  "providers": {
+    "anthropic": { "apiKey": "sk-..." },
+    "ollama": { "baseURL": "http://localhost:11434/v1" }
+  },
+  "agents": [
+    {
+      "id": "coordinator",
+      "name": "Coordinator",
+      "provider": "ollama",
+      "model": "llama3.1:8b-instruct-q8_0",
+      "skills": [],
+      "isCoordinator": true
+    }
+  ],
+  "defaultAgent": "coordinator",
+  "skillsDir": "~/.officeclaw/skills",
+  "sandbox": { ... }
 }
 ```
 
-### 8.3 Mix providers across agents
+Key rules:
+- Each agent has `"id"`, `"name"`, `"provider"`, `"model"`, `"skills"`, `"isCoordinator"`
+- Valid providers: `"anthropic"`, `"openai"`, `"ollama"`
+- For Ollama, the model ID must match exactly what `ollama list` shows (e.g. `"llama3.1:8b-instruct-q8_0"`)
+- Exactly one agent should have `"isCoordinator": true`
+- The `"defaultAgent"` must match an existing agent ID
 
-You can even use different providers per agent. For example, run the coordinator on Claude and specialists on Ollama:
+## Agent Workspace Files
 
-```json
-{
-  "id": "coordinator",
-  "provider": "anthropic",
-  "model": "claude-sonnet-4-20250514",
-  ...
-},
-{
-  "id": "coder",
-  "provider": "ollama",
-  "model": "llama3.1:8b-instruct-q8_0",
-  ...
-}
+Each agent has a workspace at `~/.officeclaw/agents/<id>/`:
+- `SOUL.md` — personality, role, guidelines (loaded into the system prompt)
+- `MEMORY.md` — persistent memory across sessions
+- `IDENTITY.md` — agent identity
+- `HEARTBEAT.md` — scheduled tasks
+
+## Workflow
+
+When asked to make a change:
+1. Read the current file first
+2. Make the requested edit
+3. Read it back to verify correctness
+4. Tell the user to restart the chat for changes to take effect
+
+Keep all interactions professional and safe for work.
+EOF
 ```
 
-Make sure the provider is configured in the `"providers"` section at the top of the config (e.g., an API key for Anthropic, a base URL for Ollama).
+### 8.4 Test: change an agent's persona
 
-### 8.4 Verify the change
-
-Restart the chat and check the model:
+Start the chat and switch to the config agent:
 
 ```bash
 npx tsx src/cli/main.ts chat
 ```
 
-The startup banner shows the active agent's model. Use `/switch <id>` and check which model each agent reports, or run:
+```
+[coordinator] > /switch config
+[config] > Make the researcher more focused on data science. Update its SOUL.md to emphasize statistical analysis, data visualization, and Python/pandas expertise.
+```
+
+The config agent should:
+1. Read `~/.officeclaw/agents/researcher/SOUL.md`
+2. Write an updated version
+3. Read it back to confirm
+
+After it finishes, exit and restart the chat, then verify:
+
+```
+[coordinator] > /switch researcher
+[researcher] > What are your core skills?
+```
+
+The researcher should now reflect the updated persona.
+
+### 8.5 Test: change an agent's model
+
+```bash
+npx tsx src/cli/main.ts chat
+```
+
+```
+[coordinator] > /switch config
+[config] > Change the coder agent to use the model "codellama:13b" on ollama. Read the config, make the change, and verify it.
+```
+
+The config agent should:
+1. Read `~/.officeclaw/config.json`
+2. Update the coder's `"model"` field
+3. Read it back and confirm valid JSON
+
+> **Note:** The new model must already be pulled in Ollama (`ollama pull codellama:13b`). The config agent changes the config but cannot pull models.
+
+### 8.6 Test: mix providers across agents
+
+Ask the config agent to set different providers for different agents:
+
+```
+[config] > Set the coordinator to use anthropic with model claude-sonnet-4-20250514, and keep all other agents on ollama with llama3.1:8b-instruct-q8_0. Make sure the anthropic provider section has a placeholder API key.
+```
+
+This demonstrates that each agent can run on a completely different backend.
+
+### 8.7 Verify with doctor
+
+After any config change, restart and run a health check:
 
 ```bash
 npx tsx src/cli/main.ts doctor
 ```
+
+Check that:
+- All agents show the correct provider/model
+- No warnings about missing workspaces
+- The config agent appears in the agent list
+
+### 8.8 Why a dedicated config agent?
+
+- **Least privilege** — only the config agent has write access to `~/.officeclaw/`. Other agents cannot accidentally break the config or modify each other's personas.
+- **Audit trail** — all config changes go through the sandbox audit log.
+- **Validation** — the config agent's SOUL.md instructs it to verify changes, catching invalid JSON before it causes startup errors.
+- **Delegation** — the coordinator can delegate config tasks to the config agent via `delegate_to_agent`, keeping the workflow natural.
 
 ---
 
@@ -676,7 +759,7 @@ npx tsx src/cli/main.ts sandbox remove ~/officeclaw-tutorial/projects
 | Coder agent | 5 | Code creation, editing, write confirmation gate |
 | Writer agent | 6 | Documentation creation, tone editing |
 | Custom agents | 7 | agents add, SOUL.md customization, agents remove |
-| Per-agent models | 8 | Changing model/provider per agent via config |
+| Config agent | 8 | Dedicated agent for managing config, personas, models, verification |
 | Shared skills | 9 | Default skills, custom shared skill creation |
 | Per-agent skills | 9 | Coder-specific security-check skill |
 | Heartbeat/cron | 10 | Scheduled task definition, automatic execution |
@@ -684,4 +767,4 @@ npx tsx src/cli/main.ts sandbox remove ~/officeclaw-tutorial/projects
 | Audit logging | 12 | View all ops, filter denied, raw JSONL |
 | Write confirmation | 5 | Approve/Deny prompt before file writes |
 | Agent switching | 4-6 | /switch between agents in chat |
-| Multi-provider | 1, 8 | Anthropic, Ollama, OpenAI-compatible setup |
+| Multi-provider | 1, 8 | Anthropic, Ollama, OpenAI-compatible setup, per-agent model config |
