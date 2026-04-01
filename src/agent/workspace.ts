@@ -144,7 +144,7 @@ export function buildSandboxInfoPrompt(
   }
 
   lines.push(
-    'If you need access to a directory not listed here, tell the user and ask them to add it via `openclaw sandbox add <path>`.',
+    'If you need access to a directory not listed here, tell the user and ask them to add it via `officeclaw sandbox add <path>`.',
   );
 
   return lines.join("\n");

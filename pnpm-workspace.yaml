@@ -1,2 +1,8 @@
 packages:
   - .
+allowBuilds:
+  '@matrix-org/matrix-sdk-crypto-nodejs': false
+  esbuild: false
+  koffi: true
+  node-llama-cpp: true
+  protobufjs: false

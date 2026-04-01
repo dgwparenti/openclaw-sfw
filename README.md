@@ -1,8 +1,8 @@
-# OpenClaw SFW - Multi-Agent Framework
+# OfficeClaw SFW - Multi-Agent Framework
 
 A minimal, multi-agent AI framework with sandboxed filesystem access, persistent identity, memory, scheduled behaviors, and skills. A coordinator agent delegates tasks to specialist agents.
 
-Forked from [OpenClaw](https://github.com/openclaw/openclaw) and stripped down to essentials. Source: [dgwparenti/openclaw-sfw](https://github.com/dgwparenti/openclaw-sfw).
+Forked from [OfficeClaw](https://github.com/officeclaw/officeclaw) and stripped down to essentials. Source: [dgwparenti/officeclaw-sfw](https://github.com/dgwparenti/officeclaw-sfw).
 
 ## What It Does
 
@@ -37,8 +37,8 @@ You can also chat directly with any agent using `/switch <id>` in the chat REPL.
 
 ```bash
 # Clone
-git clone git@github.com:dgwparenti/openclaw-sfw.git
-cd openclaw-sfw
+git clone git@github.com:dgwparenti/officeclaw-sfw.git
+cd officeclaw-sfw
 git checkout sfw-dev
 
 # Install dependencies (pnpm or npm)
@@ -68,7 +68,7 @@ node dist/cli/main.js chat
 | **coder** | Software Engineering | Reads, writes, and edits code, debugging, code review |
 | **writer** | Technical Writing | Creates documentation, edits for clarity, structures information |
 
-Each agent has its own workspace at `~/.openclaw/agents/<id>/` with independent SOUL.md (personality), MEMORY.md, session history, and optional agent-specific skills.
+Each agent has its own workspace at `~/.officeclaw/agents/<id>/` with independent SOUL.md (personality), MEMORY.md, session history, and optional agent-specific skills.
 
 ## Commands
 
@@ -76,19 +76,19 @@ Each agent has its own workspace at `~/.openclaw/agents/<id>/` with independent 
 
 | Command | Description |
 |---------|-------------|
-| `openclaw chat` | Start interactive chat (default: coordinator) |
-| `openclaw agents list` | List all configured agents |
-| `openclaw agents add <id> [--name <name>]` | Add a new specialist agent |
-| `openclaw agents remove <id>` | Remove an agent from config |
-| `openclaw sandbox list` | Show approved directories |
-| `openclaw sandbox add <path> [--write]` | Approve a directory |
-| `openclaw sandbox remove <path>` | Revoke access |
-| `openclaw sandbox test <path>` | Check if a path is accessible |
-| `openclaw sandbox log [--denied]` | View audit log |
-| `openclaw sandbox deny <glob>` | Add a deny pattern |
-| `openclaw sandbox reset` | Remove all approved directories |
-| `openclaw onboard` | First-time setup wizard |
-| `openclaw doctor` | Health check |
+| `officeclaw chat` | Start interactive chat (default: coordinator) |
+| `officeclaw agents list` | List all configured agents |
+| `officeclaw agents add <id> [--name <name>]` | Add a new specialist agent |
+| `officeclaw agents remove <id>` | Remove an agent from config |
+| `officeclaw sandbox list` | Show approved directories |
+| `officeclaw sandbox add <path> [--write]` | Approve a directory |
+| `officeclaw sandbox remove <path>` | Revoke access |
+| `officeclaw sandbox test <path>` | Check if a path is accessible |
+| `officeclaw sandbox log [--denied]` | View audit log |
+| `officeclaw sandbox deny <glob>` | Add a deny pattern |
+| `officeclaw sandbox reset` | Remove all approved directories |
+| `officeclaw onboard` | First-time setup wizard |
+| `officeclaw doctor` | Health check |
 
 ### Chat Commands (inside the REPL)
 
@@ -105,14 +105,14 @@ Skills are markdown instruction files that extend what agents can do. They are l
 
 ### Shared Skills (available to all agents)
 
-Located at `~/.openclaw/skills/`. Default skills created on setup:
+Located at `~/.officeclaw/skills/`. Default skills created on setup:
 
 - `summarize/SKILL.md` -- Summarize documents or text concisely
 - `code-review/SKILL.md` -- Review code for bugs, style, and security
 
 ### Per-Agent Skills
 
-Located at `~/.openclaw/agents/<id>/skills/`. Only available to that specific agent.
+Located at `~/.officeclaw/agents/<id>/skills/`. Only available to that specific agent.
 
 ### Skill Format
 
@@ -127,7 +127,7 @@ Instructions for the agent when this skill is relevant...
 
 ## Configuration
 
-Config lives at `~/.openclaw/config.json`:
+Config lives at `~/.officeclaw/config.json`:
 
 ```jsonc
 {
@@ -142,7 +142,7 @@ Config lives at `~/.openclaw/config.json`:
     { "id": "writer", "name": "Writer", "provider": "anthropic", "model": "claude-sonnet-4-20250514" }
   ],
   "defaultAgent": "coordinator",
-  "skillsDir": "~/.openclaw/skills",
+  "skillsDir": "~/.officeclaw/skills",
   "sandbox": {
     "read": ["~/Documents"],
     "readWrite": ["~/Desktop"],
@@ -165,11 +165,11 @@ Each agent can use a different provider and model. For example, you could run th
 - Symlink resolution prevents escape attacks
 - Deny patterns block sensitive files (.env, .pem, .key, node_modules, .git)
 - Write confirmation gate prompts before file modifications outside the workspace
-- All operations are audit-logged to `~/.openclaw/audit.jsonl`
+- All operations are audit-logged to `~/.officeclaw/audit.jsonl`
 
 ## Workspace Files
 
-Each agent has these files in its workspace (`~/.openclaw/agents/<id>/`):
+Each agent has these files in its workspace (`~/.officeclaw/agents/<id>/`):
 
 | File | Purpose |
 |------|---------|
@@ -193,7 +193,7 @@ Each agent has these files in its workspace (`~/.openclaw/agents/<id>/`):
 ## Directory Structure
 
 ```
-~/.openclaw/
+~/.officeclaw/
   config.json              Global configuration
   audit.jsonl              Audit log of all file operations
   skills/                  Shared skills (available to all agents)
@@ -245,7 +245,7 @@ src/
 
 ## Credits
 
-Forked from [OpenClaw](https://github.com/openclaw/openclaw). Stripped from 8,700+ files to 18 files while preserving the core agent runtime concepts and adding multi-agent coordination.
+Forked from [OfficeClaw](https://github.com/officeclaw/officeclaw). Stripped from 8,700+ files to 18 files while preserving the core agent runtime concepts and adding multi-agent coordination.
 
 ## License
 

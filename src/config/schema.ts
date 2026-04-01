@@ -43,7 +43,7 @@ export const AppConfigSchema = z.object({
     .default({}),
   agents: z.array(AgentDefinitionSchema).default(DEFAULT_AGENTS),
   defaultAgent: z.string().default("coordinator"),
-  skillsDir: z.string().default("~/.openclaw/skills"),
+  skillsDir: z.string().default("~/.officeclaw/skills"),
   sandbox: SandboxConfigSchema.default({
     read: [],
     readWrite: [],

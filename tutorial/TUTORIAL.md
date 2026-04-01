@@ -1,4 +1,4 @@
-# OpenClaw SFW Tutorial
+# OfficeClaw SFW Tutorial
 
 A hands-on walkthrough that exercises every agent and feature. Work through each section in order.
 
@@ -11,7 +11,7 @@ A hands-on walkthrough that exercises every agent and feature. Work through each
 ### 1.1 Install and onboard
 
 ```bash
-cd openclaw-sfw
+cd officeclaw-sfw
 pnpm install          # or: npm install
 npx tsx src/cli/main.ts onboard
 ```
@@ -31,7 +31,7 @@ npx tsx src/cli/main.ts doctor
 Expected output:
 ```
   [1/5] Configuration
-    OK: Config at ~/.openclaw/config.json
+    OK: Config at ~/.officeclaw/config.json
 
   [2/5] Agents
     OK: coordinator [coordinator]
@@ -43,7 +43,7 @@ Expected output:
     OK: API key configured
 
   [4/5] Skills
-    Skills dir: ~/.openclaw/skills (2 skills)
+    Skills dir: ~/.officeclaw/skills (2 skills)
       - code-review
       - summarize
 
@@ -70,15 +70,15 @@ The sandbox controls which directories agents can access. By default, only agent
 ### 2.1 Create a test directory
 
 ```bash
-mkdir -p ~/openclaw-tutorial/projects
-echo "Hello from the tutorial" > ~/openclaw-tutorial/projects/hello.txt
-echo "SECRET=do-not-read" > ~/openclaw-tutorial/projects/.env
+mkdir -p ~/officeclaw-tutorial/projects
+echo "Hello from the tutorial" > ~/officeclaw-tutorial/projects/hello.txt
+echo "SECRET=do-not-read" > ~/officeclaw-tutorial/projects/.env
 ```
 
 ### 2.2 Test access before approval
 
 ```bash
-npx tsx src/cli/main.ts sandbox test ~/openclaw-tutorial/projects/hello.txt
+npx tsx src/cli/main.ts sandbox test ~/officeclaw-tutorial/projects/hello.txt
 ```
 
 Expected: both Read and Write show **DENIED**.
@@ -86,13 +86,13 @@ Expected: both Read and Write show **DENIED**.
 ### 2.3 Approve the directory
 
 ```bash
-npx tsx src/cli/main.ts sandbox add ~/openclaw-tutorial/projects --write
+npx tsx src/cli/main.ts sandbox add ~/officeclaw-tutorial/projects --write
 ```
 
 ### 2.4 Test access after approval
 
 ```bash
-npx tsx src/cli/main.ts sandbox test ~/openclaw-tutorial/projects/hello.txt
+npx tsx src/cli/main.ts sandbox test ~/officeclaw-tutorial/projects/hello.txt
 ```
 
 Expected: Read **ALLOWED**, Write **ALLOWED**.
@@ -100,7 +100,7 @@ Expected: Read **ALLOWED**, Write **ALLOWED**.
 ### 2.5 Test deny patterns
 
 ```bash
-npx tsx src/cli/main.ts sandbox test ~/openclaw-tutorial/projects/.env
+npx tsx src/cli/main.ts sandbox test ~/officeclaw-tutorial/projects/.env
 ```
 
 Expected: **DENIED** -- the `.env` deny pattern blocks it even though the directory is approved.
@@ -150,7 +150,7 @@ Commands: /agents, /switch <id>, /new, /exit
 Try these prompts to see the coordinator use `delegate_to_agent`:
 
 ```
-[coordinator] > Read the file ~/openclaw-tutorial/projects/hello.txt and summarize what you find
+[coordinator] > Read the file ~/officeclaw-tutorial/projects/hello.txt and summarize what you find
 ```
 
 The coordinator should delegate to the researcher. You will see tool calls like:
@@ -161,7 +161,7 @@ The coordinator should delegate to the researcher. You will see tool calls like:
 ### 3.4 Multi-agent delegation
 
 ```
-[coordinator] > Read ~/openclaw-tutorial/projects/hello.txt, then write a more detailed version of it at ~/openclaw-tutorial/projects/hello-v2.txt
+[coordinator] > Read ~/officeclaw-tutorial/projects/hello.txt, then write a more detailed version of it at ~/officeclaw-tutorial/projects/hello-v2.txt
 ```
 
 The coordinator may delegate reading to the researcher and writing to the writer (or coder). Watch the tool calls to see which agents are invoked.
@@ -193,7 +193,7 @@ The prompt changes to `[researcher] >`.
 ### 4.2 Ask the researcher to analyze files
 
 ```
-[researcher] > List all files in ~/openclaw-tutorial/projects/ and describe what you find
+[researcher] > List all files in ~/officeclaw-tutorial/projects/ and describe what you find
 ```
 
 The researcher should use the `ls` and `read` tools directly (no delegation -- it is a specialist).
@@ -201,7 +201,7 @@ The researcher should use the `ls` and `read` tools directly (no delegation -- i
 ### 4.3 Ask for a summary
 
 ```
-[researcher] > Read ~/openclaw-tutorial/projects/hello.txt and give me a detailed analysis of its contents
+[researcher] > Read ~/officeclaw-tutorial/projects/hello.txt and give me a detailed analysis of its contents
 ```
 
 ### 4.4 Test denied access
@@ -225,12 +225,12 @@ The sandbox should deny this. The agent should report the denial.
 ### 5.2 Ask the coder to create a file
 
 ```
-[coder] > Create a Python script at ~/openclaw-tutorial/projects/fibonacci.py that prints the first 20 Fibonacci numbers
+[coder] > Create a Python script at ~/officeclaw-tutorial/projects/fibonacci.py that prints the first 20 Fibonacci numbers
 ```
 
 If `confirmWrites` is enabled (the default), you will be prompted:
 ```
-  Agent wants to write: ~/openclaw-tutorial/projects/fibonacci.py
+  Agent wants to write: ~/officeclaw-tutorial/projects/fibonacci.py
   Preview: ...
   [A]pprove / [D]eny:
 ```
@@ -240,7 +240,7 @@ Type `A` to approve.
 ### 5.3 Ask the coder to review code
 
 ```
-[coder] > Read ~/openclaw-tutorial/projects/fibonacci.py and review it for any issues
+[coder] > Read ~/officeclaw-tutorial/projects/fibonacci.py and review it for any issues
 ```
 
 ### 5.4 Ask the coder to edit code
@@ -254,7 +254,7 @@ Approve the edit when prompted.
 ### 5.5 Verify the file was created
 
 ```bash
-cat ~/openclaw-tutorial/projects/fibonacci.py
+cat ~/officeclaw-tutorial/projects/fibonacci.py
 ```
 
 ---
@@ -270,7 +270,7 @@ cat ~/openclaw-tutorial/projects/fibonacci.py
 ### 6.2 Ask the writer to create documentation
 
 ```
-[writer] > Read ~/openclaw-tutorial/projects/fibonacci.py and create a README.md for it at ~/openclaw-tutorial/projects/README.md
+[writer] > Read ~/officeclaw-tutorial/projects/fibonacci.py and create a README.md for it at ~/officeclaw-tutorial/projects/README.md
 ```
 
 Approve the write when prompted.
@@ -284,7 +284,7 @@ Approve the write when prompted.
 ### 6.4 Verify
 
 ```bash
-cat ~/openclaw-tutorial/projects/README.md
+cat ~/officeclaw-tutorial/projects/README.md
 ```
 
 ---
@@ -306,7 +306,7 @@ npx tsx src/cli/main.ts agents add analyst --name "Data Analyst"
 Edit the SOUL.md:
 
 ```bash
-cat > ~/.openclaw/agents/analyst/SOUL.md << 'EOF'
+cat > ~/.officeclaw/agents/analyst/SOUL.md << 'EOF'
 # Data Analyst Agent
 
 You are a data analyst. You excel at:
@@ -354,7 +354,7 @@ Skills are markdown instruction files that extend agent capabilities.
 ### 8.1 View default skills
 
 ```bash
-ls ~/.openclaw/skills/
+ls ~/.officeclaw/skills/
 ```
 
 You should see `summarize/` and `code-review/`.
@@ -362,14 +362,14 @@ You should see `summarize/` and `code-review/`.
 ### 8.2 Read a default skill
 
 ```bash
-cat ~/.openclaw/skills/summarize/SKILL.md
+cat ~/.officeclaw/skills/summarize/SKILL.md
 ```
 
 ### 8.3 Create a custom shared skill
 
 ```bash
-mkdir -p ~/.openclaw/skills/explain-like-im-five
-cat > ~/.openclaw/skills/explain-like-im-five/SKILL.md << 'EOF'
+mkdir -p ~/.officeclaw/skills/explain-like-im-five
+cat > ~/.officeclaw/skills/explain-like-im-five/SKILL.md << 'EOF'
 ---
 name: explain-like-im-five
 description: Explain complex topics in simple terms a 5-year-old would understand
@@ -389,8 +389,8 @@ EOF
 This skill will only be available to the coder agent:
 
 ```bash
-mkdir -p ~/.openclaw/agents/coder/skills/security-check
-cat > ~/.openclaw/agents/coder/skills/security-check/SKILL.md << 'EOF'
+mkdir -p ~/.officeclaw/agents/coder/skills/security-check
+cat > ~/.officeclaw/agents/coder/skills/security-check/SKILL.md << 'EOF'
 ---
 name: security-check
 description: Check code for common security vulnerabilities
@@ -439,14 +439,14 @@ The heartbeat system runs tasks on a schedule defined in each agent's HEARTBEAT.
 Edit the coordinator's heartbeat:
 
 ```bash
-cat > ~/.openclaw/agents/coordinator/HEARTBEAT.md << 'EOF'
+cat > ~/.officeclaw/agents/coordinator/HEARTBEAT.md << 'EOF'
 # Heartbeat
 
 ## Tasks
 
 ### Quick Check
 - Schedule: every 1 minutes
-- Task: Check if there are any new files in ~/openclaw-tutorial/projects/ and briefly report what you see
+- Task: Check if there are any new files in ~/officeclaw-tutorial/projects/ and briefly report what you see
 EOF
 ```
 
@@ -468,7 +468,7 @@ The coordinator will execute the task and report results.
 To stop the recurring task, remove it:
 
 ```bash
-cat > ~/.openclaw/agents/coordinator/HEARTBEAT.md << 'EOF'
+cat > ~/.officeclaw/agents/coordinator/HEARTBEAT.md << 'EOF'
 # Heartbeat
 
 ## Tasks
@@ -521,7 +521,7 @@ In the new session, the agent will not have the previous context (unless it was 
 ### 10.4 Check session files
 
 ```bash
-ls ~/.openclaw/agents/coordinator/sessions/
+ls ~/.officeclaw/agents/coordinator/sessions/
 ```
 
 You should see `.jsonl` files for each session.
@@ -547,7 +547,7 @@ npx tsx src/cli/main.ts sandbox log --denied
 ### 11.3 Check the raw log
 
 ```bash
-tail -5 ~/.openclaw/audit.jsonl
+tail -5 ~/.officeclaw/audit.jsonl
 ```
 
 Each line is a JSON object with: timestamp, operation, targetPath, resolvedPath, allowed, reason.
@@ -576,8 +576,8 @@ This checks:
 Remove the tutorial test files:
 
 ```bash
-rm -rf ~/openclaw-tutorial
-npx tsx src/cli/main.ts sandbox remove ~/openclaw-tutorial/projects
+rm -rf ~/officeclaw-tutorial
+npx tsx src/cli/main.ts sandbox remove ~/officeclaw-tutorial/projects
 ```
 
 ---

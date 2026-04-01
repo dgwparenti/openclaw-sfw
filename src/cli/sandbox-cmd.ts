@@ -28,7 +28,7 @@ export function runSandboxCommand(args: string[]): void {
       resetSandbox();
       break;
     default:
-      console.log(`Usage: openclaw sandbox <list|add|remove|test|log|deny|reset>`);
+      console.log(`Usage: officeclaw sandbox <list|add|remove|test|log|deny|reset>`);
       console.log("");
       console.log("  list                       Show approved directories");
       console.log("  add <path> [--write]        Add a read (or read-write) directory");
@@ -74,7 +74,7 @@ function addDirectory(args: string[]): void {
   const dirPath = args.find((a) => !a.startsWith("--"));
 
   if (!dirPath) {
-    console.error("Usage: openclaw sandbox add <path> [--write]");
+    console.error("Usage: officeclaw sandbox add <path> [--write]");
     return;
   }
 
@@ -100,7 +100,7 @@ function addDirectory(args: string[]): void {
 function removeDirectory(args: string[]): void {
   const dirPath = args[0];
   if (!dirPath) {
-    console.error("Usage: openclaw sandbox remove <path>");
+    console.error("Usage: officeclaw sandbox remove <path>");
     return;
   }
 
@@ -117,13 +117,13 @@ function removeDirectory(args: string[]): void {
 function testPath(args: string[]): void {
   const testFilePath = args[0];
   if (!testFilePath) {
-    console.error("Usage: openclaw sandbox test <path>");
+    console.error("Usage: officeclaw sandbox test <path>");
     return;
   }
 
   const config = loadConfig();
   const defaultAgentId = config.defaultAgent ?? config.agents[0]?.id ?? "coordinator";
-  const validator = createPathValidator(config.sandbox, resolveHomePath(`~/.openclaw/agents/${defaultAgentId}`));
+  const validator = createPathValidator(config.sandbox, resolveHomePath(`~/.officeclaw/agents/${defaultAgentId}`));
 
   const readResult = validator.validateRead(testFilePath, process.cwd());
   const writeResult = validator.validateWrite(testFilePath, process.cwd());
@@ -159,7 +159,7 @@ function showLog(args: string[]): void {
 function addDenyPattern(args: string[]): void {
   const pattern = args[0];
   if (!pattern) {
-    console.error("Usage: openclaw sandbox deny <glob>");
+    console.error("Usage: officeclaw sandbox deny <glob>");
     return;
   }
 

@@ -32,7 +32,7 @@ async function main() {
 
     case "--version":
     case "-v":
-      console.log("openclaw 0.2.0");
+      console.log("officeclaw 0.2.0");
       break;
 
     case "--help":
@@ -50,9 +50,9 @@ async function main() {
 
 function printHelp() {
   console.log(`
-openclaw - Multi-Agent SFW Framework
+officeclaw - Multi-Agent SFW Framework
 
-Usage: openclaw <command> [options]
+Usage: officeclaw <command> [options]
 
 Commands:
   chat              Start an interactive chat session (default: coordinator)
@@ -96,7 +96,7 @@ function runAgentsCommand(subArgs: string[]) {
     case "add": {
       const id = subArgs[1];
       if (!id) {
-        console.error("Usage: openclaw agents add <id> [--name <name>]");
+        console.error("Usage: officeclaw agents add <id> [--name <name>]");
         return;
       }
       if (config.agents.some((a) => a.id === id)) {
@@ -116,14 +116,14 @@ function runAgentsCommand(subArgs: string[]) {
       });
       saveConfig(config);
       console.log(`Added agent: ${id} (${name})`);
-      console.log(`Edit its personality: ~/.openclaw/agents/${id}/SOUL.md`);
+      console.log(`Edit its personality: ~/.officeclaw/agents/${id}/SOUL.md`);
       break;
     }
 
     case "remove": {
       const id = subArgs[1];
       if (!id) {
-        console.error("Usage: openclaw agents remove <id>");
+        console.error("Usage: officeclaw agents remove <id>");
         return;
       }
       const idx = config.agents.findIndex((a) => a.id === id);
@@ -133,12 +133,12 @@ function runAgentsCommand(subArgs: string[]) {
       }
       config.agents.splice(idx, 1);
       saveConfig(config);
-      console.log(`Removed agent "${id}" from config. Directory preserved at ~/.openclaw/agents/${id}/`);
+      console.log(`Removed agent "${id}" from config. Directory preserved at ~/.officeclaw/agents/${id}/`);
       break;
     }
 
     default:
-      console.log("Usage: openclaw agents <list|add|remove>");
+      console.log("Usage: officeclaw agents <list|add|remove>");
   }
 }
 

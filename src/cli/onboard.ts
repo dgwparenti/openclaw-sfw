@@ -11,7 +11,7 @@ function prompt(rl: readline.Interface, question: string): Promise<string> {
 export async function runOnboard(): Promise<void> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-  console.log("\n  Welcome to OpenClaw\n");
+  console.log("\n  Welcome to OfficeClaw\n");
   console.log("  This wizard sets up your multi-agent system.\n");
 
   const config = loadConfig();
@@ -100,13 +100,13 @@ export async function runOnboard(): Promise<void> {
   ensureDefaultSkills(resolveHomePath(config.skillsDir));
 
   console.log("\n  Setup complete!\n");
-  console.log("  Agent workspaces created at ~/.openclaw/agents/");
-  console.log("  Shared skills at ~/.openclaw/skills/");
+  console.log("  Agent workspaces created at ~/.officeclaw/agents/");
+  console.log("  Shared skills at ~/.officeclaw/skills/");
   console.log("");
   console.log("  Next steps:");
-  console.log("    openclaw chat                         # Start chatting (coordinator)");
-  console.log("    openclaw agents list                  # View agents");
-  console.log("    openclaw sandbox add ~/Documents      # Approve more directories\n");
+  console.log("    officeclaw chat                        # Start chatting (coordinator)");
+  console.log("    officeclaw agents list                 # View agents");
+  console.log("    officeclaw sandbox add ~/Documents     # Approve more directories\n");
 
   rl.close();
 }

@@ -13,7 +13,7 @@ export type AuditEntry = {
   model?: string;
 };
 
-const AUDIT_LOG_PATH = path.join(os.homedir(), ".openclaw", "audit.jsonl");
+const AUDIT_LOG_PATH = path.join(os.homedir(), ".officeclaw", "audit.jsonl");
 
 export function logAudit(entry: AuditEntry): void {
   const dir = path.dirname(AUDIT_LOG_PATH);

@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { AppConfigSchema, type AppConfig } from "./schema.js";
 
-const CONFIG_DIR = path.join(os.homedir(), ".openclaw");
+const CONFIG_DIR = path.join(os.homedir(), ".officeclaw");
 const CONFIG_FILE = path.join(CONFIG_DIR, "config.json");
 
 export function resolveHomePath(p: string): string {
@@ -31,7 +31,7 @@ export function saveConfig(config: AppConfig): void {
 }
 
 export function resolveAgentDir(agentId: string): string {
-  return resolveHomePath(`~/.openclaw/agents/${agentId}`);
+  return resolveHomePath(`~/.officeclaw/agents/${agentId}`);
 }
 
 export function resolveSkillsDir(config: AppConfig): string {

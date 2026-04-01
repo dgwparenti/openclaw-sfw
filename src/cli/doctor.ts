@@ -4,18 +4,18 @@ import path from "node:path";
 import { loadConfig, resolveAgentDir, resolveSkillsDir } from "../config/loader.js";
 
 export function runDoctor(): void {
-  console.log("\n  OpenClaw Doctor\n");
+  console.log("\n  OfficeClaw Doctor\n");
 
   const config = loadConfig();
   let issues = 0;
 
   // Check config
   console.log("  [1/5] Configuration");
-  const configPath = path.join(os.homedir(), ".openclaw", "config.json");
+  const configPath = path.join(os.homedir(), ".officeclaw", "config.json");
   if (fs.existsSync(configPath)) {
     console.log(`    OK: Config at ${configPath}`);
   } else {
-    console.log(`    WARN: No config. Run 'openclaw onboard'.`);
+    console.log(`    WARN: No config. Run 'officeclaw onboard'.`);
     issues++;
   }
 
@@ -29,7 +29,7 @@ export function runDoctor(): void {
     if (exists && hasSoul) {
       console.log(`    OK: ${agentDef.id}${marker} — ${agentDir}`);
     } else {
-      console.log(`    WARN: ${agentDef.id}${marker} — workspace missing. Run 'openclaw onboard'.`);
+      console.log(`    WARN: ${agentDef.id}${marker} — workspace missing. Run 'officeclaw onboard'.`);
       issues++;
     }
   }
@@ -56,7 +56,7 @@ export function runDoctor(): void {
     console.log(`    Skills dir: ${skillsDir} (${skillDirs.length} skills)`);
     for (const s of skillDirs) console.log(`      - ${s}`);
   } else {
-    console.log(`    Skills dir not found. Run 'openclaw onboard' to create defaults.`);
+    console.log(`    Skills dir not found. Run 'officeclaw onboard' to create defaults.`);
   }
 
   // Check sandbox + runtime

@@ -74,7 +74,7 @@ export function createPathValidator(config: SandboxConfig, workspaceDir: string)
     return {
       allowed: false,
       resolvedPath: resolved,
-      reason: `Path not within any approved directory. Use "openclaw sandbox add <dir>" to grant access.`,
+      reason: `Path not within any approved directory. Use "officeclaw sandbox add <dir>" to grant access.`,
     };
   }
 
@@ -101,14 +101,14 @@ export function createPathValidator(config: SandboxConfig, workspaceDir: string)
       return {
         allowed: false,
         resolvedPath: resolved,
-        reason: `Path is in read-only directory: ${readOnlyDir}. Use "openclaw sandbox add ${readOnlyDir} --write" for write access.`,
+        reason: `Path is in read-only directory: ${readOnlyDir}. Use "officeclaw sandbox add ${readOnlyDir} --write" for write access.`,
       };
     }
 
     return {
       allowed: false,
       resolvedPath: resolved,
-      reason: `Path not within any approved directory. Use "openclaw sandbox add <dir> --write" to grant access.`,
+      reason: `Path not within any approved directory. Use "officeclaw sandbox add <dir> --write" to grant access.`,
     };
   }
 
