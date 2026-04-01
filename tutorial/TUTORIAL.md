@@ -347,11 +347,93 @@ npx tsx src/cli/main.ts agents remove analyst
 
 ---
 
-## 8. Skills
+## 8. Per-Agent Model Configuration
+
+Each agent can use a different model or provider. This is configured in `~/.officeclaw/config.json`.
+
+> **Note:** Agents cannot change their own model at runtime. The config file must be edited manually, then the chat restarted for changes to take effect.
+
+### 8.1 View the current config
+
+```bash
+cat ~/.officeclaw/config.json
+```
+
+Each agent entry has `"provider"` and `"model"` fields:
+
+```json
+{
+  "id": "coder",
+  "name": "Coder",
+  "provider": "ollama",
+  "model": "llama3.1:8b-instruct-q8_0",
+  ...
+}
+```
+
+### 8.2 Change the model for one agent
+
+Open the config and change just the coder's model (for example, to a different Ollama model):
+
+```bash
+# Edit with your preferred editor
+nano ~/.officeclaw/config.json
+```
+
+Change the `"model"` field for the agent you want to update. For example, to give the coder a different model than the others:
+
+```json
+{
+  "id": "coder",
+  "name": "Coder",
+  "provider": "ollama",
+  "model": "codellama:13b",
+  ...
+}
+```
+
+### 8.3 Mix providers across agents
+
+You can even use different providers per agent. For example, run the coordinator on Claude and specialists on Ollama:
+
+```json
+{
+  "id": "coordinator",
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-20250514",
+  ...
+},
+{
+  "id": "coder",
+  "provider": "ollama",
+  "model": "llama3.1:8b-instruct-q8_0",
+  ...
+}
+```
+
+Make sure the provider is configured in the `"providers"` section at the top of the config (e.g., an API key for Anthropic, a base URL for Ollama).
+
+### 8.4 Verify the change
+
+Restart the chat and check the model:
+
+```bash
+npx tsx src/cli/main.ts chat
+```
+
+The startup banner shows the active agent's model. Use `/switch <id>` and check which model each agent reports, or run:
+
+```bash
+npx tsx src/cli/main.ts doctor
+```
+
+---
+
+## 9. Skills
 
 Skills are markdown instruction files that extend agent capabilities.
 
-### 8.1 View default skills
+### 9.1 View default skills
 
 ```bash
 ls ~/.officeclaw/skills/
@@ -359,13 +441,13 @@ ls ~/.officeclaw/skills/
 
 You should see `summarize/` and `code-review/`.
 
-### 8.2 Read a default skill
+### 9.2 Read a default skill
 
 ```bash
 cat ~/.officeclaw/skills/summarize/SKILL.md
 ```
 
-### 8.3 Create a custom shared skill
+### 9.3 Create a custom shared skill
 
 ```bash
 mkdir -p ~/.officeclaw/skills/explain-like-im-five
@@ -384,7 +466,7 @@ When asked to explain something simply:
 EOF
 ```
 
-### 8.4 Create a per-agent skill
+### 9.4 Create a per-agent skill
 
 This skill will only be available to the coder agent:
 
@@ -407,7 +489,7 @@ When reviewing code for security:
 EOF
 ```
 
-### 8.5 Verify skills load
+### 9.5 Verify skills load
 
 Run doctor to confirm the shared skill count increased:
 
@@ -417,7 +499,7 @@ npx tsx src/cli/main.ts doctor
 
 The skills section should now show 3 skills (summarize, code-review, explain-like-im-five).
 
-### 8.6 Test the skill in chat
+### 9.6 Test the skill in chat
 
 ```bash
 npx tsx src/cli/main.ts chat
@@ -430,11 +512,11 @@ npx tsx src/cli/main.ts chat
 
 ---
 
-## 9. Heartbeat (Scheduled Tasks)
+## 10. Heartbeat (Scheduled Tasks)
 
 The heartbeat system runs tasks on a schedule defined in each agent's HEARTBEAT.md.
 
-### 9.1 Define a quick test task
+### 10.1 Define a quick test task
 
 Edit the coordinator's heartbeat:
 
@@ -450,7 +532,7 @@ cat > ~/.officeclaw/agents/coordinator/HEARTBEAT.md << 'EOF'
 EOF
 ```
 
-### 9.2 Start chat and wait
+### 10.2 Start chat and wait
 
 ```bash
 npx tsx src/cli/main.ts chat
@@ -463,7 +545,7 @@ Within ~1 minute, you should see:
 
 The coordinator will execute the task and report results.
 
-### 9.3 Disable the heartbeat
+### 10.3 Disable the heartbeat
 
 To stop the recurring task, remove it:
 
@@ -479,11 +561,11 @@ EOF
 
 ---
 
-## 10. Session Management
+## 11. Session Management
 
 Sessions persist across chat restarts. Each agent has independent sessions.
 
-### 10.1 Start a conversation
+### 11.1 Start a conversation
 
 ```bash
 npx tsx src/cli/main.ts chat
@@ -494,7 +576,7 @@ npx tsx src/cli/main.ts chat
 [coordinator] > /exit
 ```
 
-### 10.2 Resume the session
+### 11.2 Resume the session
 
 ```bash
 npx tsx src/cli/main.ts chat
@@ -506,7 +588,7 @@ npx tsx src/cli/main.ts chat
 
 The agent should remember "Python" from the previous session (context is restored from the JSONL session file).
 
-### 10.3 Start a fresh session
+### 11.3 Start a fresh session
 
 ```
 [coordinator] > /new
@@ -518,7 +600,7 @@ The agent should remember "Python" from the previous session (context is restore
 
 In the new session, the agent will not have the previous context (unless it was saved to MEMORY.md).
 
-### 10.4 Check session files
+### 11.4 Check session files
 
 ```bash
 ls ~/.officeclaw/agents/coordinator/sessions/
@@ -528,23 +610,23 @@ You should see `.jsonl` files for each session.
 
 ---
 
-## 11. Audit Log
+## 12. Audit Log
 
 Every file operation (allowed or denied) is logged.
 
-### 11.1 View all audit entries
+### 12.1 View all audit entries
 
 ```bash
 npx tsx src/cli/main.ts sandbox log
 ```
 
-### 11.2 View only denied operations
+### 12.2 View only denied operations
 
 ```bash
 npx tsx src/cli/main.ts sandbox log --denied
 ```
 
-### 11.3 Check the raw log
+### 12.3 Check the raw log
 
 ```bash
 tail -5 ~/.officeclaw/audit.jsonl
@@ -554,9 +636,9 @@ Each line is a JSON object with: timestamp, operation, targetPath, resolvedPath,
 
 ---
 
-## 12. Doctor Health Check
+## 13. Doctor Health Check
 
-### 12.1 Run a full health check
+### 13.1 Run a full health check
 
 ```bash
 npx tsx src/cli/main.ts doctor
@@ -571,7 +653,7 @@ This checks:
 
 ---
 
-## 13. Cleanup
+## 14. Cleanup
 
 Remove the tutorial test files:
 
@@ -587,18 +669,19 @@ npx tsx src/cli/main.ts sandbox remove ~/officeclaw-tutorial/projects
 | Feature | Section | What was tested |
 |---------|---------|-----------------|
 | Onboarding | 1 | Provider setup, agent creation, workspace initialization |
-| Doctor | 1, 12 | Health check across all subsystems |
+| Doctor | 1, 13 | Health check across all subsystems |
 | Sandbox security | 2 | Approve/deny directories, deny patterns (.env), audit log |
 | Coordinator delegation | 3 | delegate_to_agent tool, multi-agent task flow |
 | Researcher agent | 4 | File analysis, summarization, denied access handling |
 | Coder agent | 5 | Code creation, editing, write confirmation gate |
 | Writer agent | 6 | Documentation creation, tone editing |
 | Custom agents | 7 | agents add, SOUL.md customization, agents remove |
-| Shared skills | 8 | Default skills, custom shared skill creation |
-| Per-agent skills | 8 | Coder-specific security-check skill |
-| Heartbeat/cron | 9 | Scheduled task definition, automatic execution |
-| Session persistence | 10 | Cross-restart memory, /new for fresh sessions |
-| Audit logging | 11 | View all ops, filter denied, raw JSONL |
+| Per-agent models | 8 | Changing model/provider per agent via config |
+| Shared skills | 9 | Default skills, custom shared skill creation |
+| Per-agent skills | 9 | Coder-specific security-check skill |
+| Heartbeat/cron | 10 | Scheduled task definition, automatic execution |
+| Session persistence | 11 | Cross-restart memory, /new for fresh sessions |
+| Audit logging | 12 | View all ops, filter denied, raw JSONL |
 | Write confirmation | 5 | Approve/Deny prompt before file writes |
 | Agent switching | 4-6 | /switch between agents in chat |
-| Multi-provider | 1 | Anthropic, Ollama, OpenAI-compatible setup |
+| Multi-provider | 1, 8 | Anthropic, Ollama, OpenAI-compatible setup |
