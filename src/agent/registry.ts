@@ -2,12 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   createAgentSession,
+  DefaultResourceLoader,
   SessionManager,
   type AgentSession,
   type AgentSessionEvent,
   type AgentSessionEventListener,
 } from "@mariozechner/pi-coding-agent";
-import { getModel } from "@mariozechner/pi-ai";
+import { getModel, type Model } from "@mariozechner/pi-ai";
 import type { AgentDefinition, SandboxConfig, AppConfig } from "../config/schema.js";
 import { resolveAgentDir, resolveHomePath, resolveSkillsDir } from "../config/loader.js";
 import { createPathValidator } from "../sandbox/path-validator.js";
@@ -49,7 +50,7 @@ export class AgentRegistry {
     configureProviderEnv(agentDef, opts.appConfig);
 
     // Resolve model
-    const model = resolveModelForAgent(agentDef);
+    const model = resolveModelForAgent(agentDef, opts.appConfig);
 
     // Create sandbox tools (shared sandbox config)
     const validator = createPathValidator(opts.appConfig.sandbox, agentDir);
@@ -81,6 +82,16 @@ export class AgentRegistry {
       systemPrompt += "\n\n" + formatSkillsForPrompt(skills);
     }
 
+    // Create resource loader with our system prompt
+    const resourceLoader = new DefaultResourceLoader({
+      cwd: agentDir,
+      systemPromptOverride: () => systemPrompt,
+      appendSystemPromptOverride: () => [],
+      noExtensions: true,
+      noSkills: true, // We already loaded skills into systemPrompt
+    });
+    await resourceLoader.reload();
+
     // Create session
     const sessionManager = SessionManager.continueRecent(agentDir, sessionsDir);
 
@@ -90,6 +101,7 @@ export class AgentRegistry {
       tools: sandboxedTools,
       customTools: opts.customTools,
       sessionManager,
+      resourceLoader,
       thinkingLevel: "low",
     });
 
@@ -158,13 +170,32 @@ function configureProviderEnv(agentDef: AgentDefinition, config: AppConfig): voi
   }
 }
 
-function resolveModelForAgent(agentDef: AgentDefinition) {
-  const provider = agentDef.provider === "ollama" ? "openai" : agentDef.provider;
+function resolveModelForAgent(agentDef: AgentDefinition, appConfig: AppConfig) {
+  if (agentDef.provider === "ollama") {
+    const baseUrl = appConfig.providers.ollama?.baseURL ?? "http://localhost:11434/v1";
+    const model: Model<"openai-completions"> = {
+      id: agentDef.model,
+      name: `${agentDef.model} (Ollama)`,
+      api: "openai-completions",
+      provider: "openai",
+      baseUrl,
+      reasoning: false,
+      input: ["text"],
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+      contextWindow: 128000,
+      maxTokens: 32000,
+      compat: {
+        supportsDeveloperRole: false,
+        supportsReasoningEffort: false,
+      },
+    };
+    return model;
+  }
+
   try {
-    return getModel(provider as any, agentDef.model as any);
+    return getModel(agentDef.provider as any, agentDef.model as any);
   } catch {
-    // Fallback
-    if (provider === "anthropic") return getModel("anthropic", "claude-sonnet-4-20250514");
+    if (agentDef.provider === "anthropic") return getModel("anthropic", "claude-sonnet-4-20250514");
     return getModel("openai", "gpt-4o" as any);
   }
 }
